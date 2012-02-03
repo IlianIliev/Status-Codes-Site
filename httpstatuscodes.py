@@ -95,10 +95,14 @@ class MainPage(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         if code:
             if code in STATUS_CODES and 'xx' not in code:
-                self.response.set_status(int(code), message=STATUS_CODES[code])
-                self.response.out.write('%s %s\n' % (code, STATUS_CODES[code]))
+                if code.startswith('1'):
+                    self.response.set_status(500, message=STATUS_CODES['500'])
+                    self.response.out.write('Google App Engine does not support the status codes from the Informational Group - 1xx')
+                else:
+                    self.response.set_status(int(code), message=STATUS_CODES[code])
+                    self.response.out.write('%s %s\n' % (code, STATUS_CODES[code]))
             else:
-                self.response.status = 404
+                self.response.set_status(404, message=STATUS_CODES['404'])
                 self.response.out.write('There is no such status code as %s' % code)
         else:
             for code in STATUS_CODES:
@@ -110,7 +114,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.out.write('\n\nMore information about status codes can be found at %s\n' %
                                 STATUS_CODES_DESCRIPTION_URL)
         self.response.write('For statuses out of the above reference please check %s\n' % WIKIPEDIA_CODES_DESCRIPTIONS_URL)
-        self.response.write('Please note that some of the codes above does not work due to Google App Engine restrictions')
+        self.response.write('Please have in mind that the codes from the Informational group - 1xx does not work due to Google App Engine restrictions')
 
 app = webapp2.WSGIApplication([
                                ('/', MainPage),
