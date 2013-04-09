@@ -99,6 +99,8 @@ class MainPage(webapp2.RequestHandler):
                     self.response.set_status(500, message=STATUS_CODES['500'])
                     self.response.out.write('Google App Engine does not support the status codes from the Informational Group - 1xx')
                 else:
+                    if code in ['301', '302']:
+                        self.response.headers.add_header('Location', '/')
                     self.response.set_status(int(code), message=STATUS_CODES[code])
                     self.response.out.write('%s %s\n' % (code, STATUS_CODES[code]))
             else:
